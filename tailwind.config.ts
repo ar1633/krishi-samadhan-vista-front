@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,46 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Krishi-Samadhan custom colors
+				"krishi": {
+					"50": "#f0f9eb",
+					"100": "#ddf3d1",
+					"200": "#bfe7a9",
+					"300": "#9ad677",
+					"400": "#77c04f",
+					"500": "#5aa633",
+					"600": "#478526",
+					"700": "#3a6a20",
+					"800": "#2f551b",
+					"900": "#284718",
+					"950": "#122709"
+				},
+				"earth": {
+					"50": "#f9f6f1",
+					"100": "#f0e9df",
+					"200": "#e0d0b8",
+					"300": "#cdb28d",
+					"400": "#b99367",
+					"500": "#ab7d4d",
+					"600": "#9a6941",
+					"700": "#805338",
+					"800": "#6b4532",
+					"900": "#5a3b2c",
+					"950": "#301d15"
+				},
+				"sky": {
+					"50": "#f0f9ff",
+					"100": "#e0f1fe",
+					"200": "#bae3fd",
+					"300": "#7dcefc",
+					"400": "#36b4f8",
+					"500": "#0c98ea",
+					"600": "#0179c8",
+					"700": "#0262a3",
+					"800": "#065286",
+					"900": "#0a4570",
+					"950": "#072c4a"
 				}
 			},
 			borderRadius: {
