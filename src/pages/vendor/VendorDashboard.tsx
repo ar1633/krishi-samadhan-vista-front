@@ -124,7 +124,9 @@ export default function VendorDashboard() {
         });
       } else {
         await addWarehouse({
-          ...data,
+          name: data.name,
+          location: data.location,
+          capacity: data.capacity,
           available,
           vendorId: user.id,
         });

@@ -36,7 +36,7 @@ export function Heading({
 
 export interface TextProps extends React.HTMLAttributes<HTMLParagraphElement> {
   as?: "p" | "span" | "div";
-  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
   variant?: "default" | "muted" | "highlight" | "success" | "warning" | "danger";
 }
 
@@ -57,6 +57,9 @@ export function Text({
         size === "md" && "text-base",
         size === "lg" && "text-lg",
         size === "xl" && "text-xl",
+        size === "2xl" && "text-2xl",
+        size === "3xl" && "text-3xl",
+        size === "4xl" && "text-4xl",
         variant === "default" && "text-foreground",
         variant === "muted" && "text-muted-foreground",
         variant === "highlight" && "text-primary font-medium",
