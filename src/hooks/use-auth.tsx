@@ -1,18 +1,15 @@
 
 import { createContext, useContext, ReactNode, useEffect, useState } from "react";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export type UserRole = "farmer" | "expert" | "vendor";
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: "farmer" | "expert" | "vendor";
+  role: UserRole;
   phone?: string;
   location?: string;
   expertise?: string[];
@@ -24,6 +21,7 @@ interface AuthContextType {
   register: (email: string, password: string, userData: Omit<User, "id" | "email">) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -136,7 +134,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      register, 
+      logout, 
+      loading, 
+      isAuthenticated: !!user 
+    }}>
       {children}
     </AuthContext.Provider>
   );

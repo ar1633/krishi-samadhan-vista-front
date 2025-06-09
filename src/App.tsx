@@ -35,9 +35,9 @@ const queryClient = new QueryClient();
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole?: string }) => {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated } = useAuth();
   
-  if (isLoading) {
+  if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
   

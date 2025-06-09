@@ -1,4 +1,3 @@
-
 import { Heading, Text } from "@/components/ui/typography";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import WeatherWidget from "@/components/common/WeatherWidget";
@@ -13,7 +12,7 @@ export default function FarmerDashboard() {
   const { questions } = useQuestions();
   
   // Filter questions for the current farmer
-  const farmerQuestions = user ? questions.filter(q => q.farmerId === user.id) : [];
+  const farmerQuestions = user ? questions.filter(q => q.farmer_id === user.id) : [];
   const pendingQuestions = farmerQuestions.filter(q => q.status === "pending");
   const answeredQuestions = farmerQuestions.filter(q => q.status === "answered");
   
@@ -36,9 +35,6 @@ export default function FarmerDashboard() {
               </Button>
               <Button asChild variant="outline" className="w-full">
                 <Link to="/farmer/questions">View My Questions</Link>
-              </Button>
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/farmer/weather">Detailed Weather</Link>
               </Button>
             </CardContent>
           </Card>
@@ -79,7 +75,7 @@ export default function FarmerDashboard() {
                     <div>
                       <Text className="font-medium">{question.title}</Text>
                       <Text size="sm" variant="muted" className="mt-1">
-                        Crop: {question.crop} • {format(new Date(question.createdAt), "MMM d, yyyy")}
+                        Crop: {question.crop} • {format(new Date(question.created_at), "MMM d, yyyy")}
                       </Text>
                     </div>
                     <div className={`px-2 py-1 text-xs rounded-full font-medium ${
