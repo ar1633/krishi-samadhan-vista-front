@@ -13,7 +13,7 @@ import { WarehouseFormData } from "@/types/warehouse";
 
 export default function VendorWarehouses() {
   const { user } = useAuth();
-  const { warehouses, addWarehouse, updateWarehouse, deleteWarehouse } = useWarehouses();
+  const { warehouses, loading, addWarehouse, updateWarehouse, deleteWarehouse } = useWarehouses();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editWarehouse, setEditWarehouse] = useState<Warehouse | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<Warehouse | null>(null);
@@ -21,7 +21,7 @@ export default function VendorWarehouses() {
   
   const vendorId = user?.id || "";
   const vendorWarehouses = user 
-    ? warehouses.filter(w => w.vendorId === vendorId)
+    ? warehouses.filter(w => w.vendor_id === vendorId)
     : [];
     
   // Filter warehouses based on search term
@@ -32,7 +32,7 @@ export default function VendorWarehouses() {
   
   // Sort by newest first
   const sortedWarehouses = [...filteredWarehouses].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
   
   const handleOpenModal = (warehouse?: Warehouse) => {
@@ -75,10 +75,19 @@ export default function VendorWarehouses() {
         location: data.location,
         capacity: data.capacity,
         available,
-        vendorId: user.id,
       });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="page-container">
+        <div className="flex items-center justify-center py-8">
+          <Text>Loading warehouses...</Text>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">

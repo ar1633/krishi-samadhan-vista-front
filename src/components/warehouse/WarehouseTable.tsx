@@ -50,7 +50,7 @@ export function WarehouseTable({ warehouses, onEdit, onDelete }: WarehouseTableP
                       {utilisationPercentage}%
                     </TableCell>
                     <TableCell className="text-right">
-                      {format(new Date(warehouse.createdAt), "MMM d, yyyy")}
+                      {format(new Date(warehouse.created_at), "MMM d, yyyy")}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
