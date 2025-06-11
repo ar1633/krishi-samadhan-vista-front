@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -61,19 +60,17 @@ export default function AskQuestion() {
       
       // In a real app, you would upload the image and get a URL
       // For this demo, we'll create a placeholder URL if a file exists
-      let imageUrl;
+      let image_url;
       if (uploadedFile) {
         // Simulate image upload with a placeholder
-        imageUrl = URL.createObjectURL(uploadedFile); // This is temporary and only works in the current session
+        image_url = URL.createObjectURL(uploadedFile); // This is temporary and only works in the current session
       }
       
       await addQuestion({
         title: data.title,
         crop: data.crop,
         description: data.description,
-        farmerId: user.id,
-        farmerName: user.name,
-        imageUrl,
+        image_url,
       });
       
       navigate("/farmer/questions");

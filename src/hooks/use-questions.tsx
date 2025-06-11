@@ -105,7 +105,10 @@ export const QuestionsProvider = ({ children }: { children: ReactNode }) => {
     const { error } = await supabase
       .from('questions')
       .insert({
-        ...questionData,
+        title: questionData.title,
+        crop: questionData.crop,
+        description: questionData.description,
+        image_url: questionData.image_url,
         farmer_id: user.id,
       });
 

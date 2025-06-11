@@ -21,7 +21,7 @@ export default function FarmerQuestions() {
   
   // Filter questions for the current farmer
   const farmerQuestions = user 
-    ? questions.filter(q => q.farmerId === user.id)
+    ? questions.filter(q => q.farmer_id === user.id)
     : [];
   
   const filteredQuestions = farmerQuestions.filter(question => {
@@ -39,7 +39,7 @@ export default function FarmerQuestions() {
   
   // Sort by newest first
   const sortedQuestions = [...filteredQuestions].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
   
   const handleOpenQuestion = (question: Question) => {
@@ -108,7 +108,7 @@ export default function FarmerQuestions() {
                         {question.status === "pending" ? "Pending" : "Answered"}
                       </Badge>
                       <Text size="sm" variant="muted">
-                        Asked on {format(new Date(question.createdAt), "MMM d, yyyy")}
+                        Asked on {format(new Date(question.created_at), "MMM d, yyyy")}
                       </Text>
                     </div>
                     <Text className="font-medium text-lg mb-1">{question.title}</Text>
@@ -116,10 +116,10 @@ export default function FarmerQuestions() {
                     <Text size="sm" className="line-clamp-2 mt-2">{question.description}</Text>
                   </div>
                   
-                  {question.status === "answered" && (
+                  {question.status === "answered" && question.answers && question.answers.length > 0 && (
                     <div className="ml-4 bg-green-50 px-3 py-1 rounded-md flex flex-col items-center justify-center">
                       <Text size="xs" variant="muted">Answered by</Text>
-                      <Text size="sm" className="font-medium">{question.answer?.expertName}</Text>
+                      <Text size="sm" className="font-medium">{question.answers[0].expert.name}</Text>
                     </div>
                   )}
                 </div>
@@ -163,7 +163,7 @@ export default function FarmerQuestions() {
                     Crop: {selectedQuestion.crop}
                   </span>
                   <span className="text-sm text-gray-500">
-                    Asked on {format(new Date(selectedQuestion.createdAt), "MMM d, yyyy")}
+                    Asked on {format(new Date(selectedQuestion.created_at), "MMM d, yyyy")}
                   </span>
                 </DialogDescription>
               </DialogHeader>
@@ -174,28 +174,28 @@ export default function FarmerQuestions() {
                   <Text className="mt-1 whitespace-pre-wrap">{selectedQuestion.description}</Text>
                 </div>
                 
-                {selectedQuestion.imageUrl && (
+                {selectedQuestion.image_url && (
                   <div>
                     <Text className="font-medium mb-2">Attached Image:</Text>
                     <img 
-                      src={selectedQuestion.imageUrl} 
+                      src={selectedQuestion.image_url} 
                       alt="Question attachment" 
                       className="rounded-md max-h-64 w-auto"
                     />
                   </div>
                 )}
                 
-                {selectedQuestion.status === "answered" && selectedQuestion.answer && (
+                {selectedQuestion.status === "answered" && selectedQuestion.answers && selectedQuestion.answers.length > 0 && (
                   <div className="bg-green-50 p-4 rounded-md mt-6">
                     <div className="flex justify-between items-center mb-2">
                       <Text className="font-medium">Expert Answer:</Text>
                       <Text size="sm" variant="muted">
-                        Answered on {format(new Date(selectedQuestion.answer.answeredAt), "MMM d, yyyy")}
+                        Answered on {format(new Date(selectedQuestion.answers[0].created_at), "MMM d, yyyy")}
                       </Text>
                     </div>
-                    <Text className="whitespace-pre-wrap">{selectedQuestion.answer.text}</Text>
+                    <Text className="whitespace-pre-wrap">{selectedQuestion.answers[0].content}</Text>
                     <Text size="sm" className="mt-4 text-right font-medium">
-                      - {selectedQuestion.answer.expertName}
+                      - {selectedQuestion.answers[0].expert.name}
                     </Text>
                   </div>
                 )}

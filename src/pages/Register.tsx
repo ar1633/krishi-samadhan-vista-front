@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -49,13 +48,11 @@ export default function Register() {
   const onSubmit = async (data: FormData) => {
     try {
       setIsSubmitting(true);
-      await register(
-        data.name,
-        data.email,
-        data.password,
-        data.location,
-        data.role
-      );
+      await register(data.email, data.password, {
+        name: data.name,
+        role: data.role,
+        location: data.location,
+      });
       toast({
         title: "Registration successful",
         description: "Your account has been created",
