@@ -223,7 +223,7 @@ export default function VendorDashboard() {
                     <Text className="font-medium">Expand Capacity</Text>
                     <Text size="sm" variant="muted">Your warehouses are nearly full. Consider adding more storage facilities to meet demand.</Text>
                   </div>
-                )}
+                </div>
               )}
               
               {vendorWarehouses.length === 1 && (
