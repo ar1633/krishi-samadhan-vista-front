@@ -1,272 +1,219 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Heading, Text } from "@/components/ui/typography";
-import { useQuestions, Question } from "@/hooks/use-questions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { useQuestions } from "@/hooks/use-questions";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
-import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-
-const formSchema = z.object({
-  answer: z.string()
-    .min(20, "Answer must be at least 20 characters")
-    .max(2000, "Answer must be less than 2000 characters"),
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { Badge } from "@/components/ui/badge";
 
 export default function ExpertDashboard() {
   const { user } = useAuth();
-  const { questions, answerQuestion } = useQuestions();
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { questions } = useQuestions();
   
   const pendingQuestions = questions.filter(q => q.status === "pending");
   const answeredQuestions = questions.filter(q => q.status === "answered");
   
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      answer: "",
-    },
-  });
+  // Get recent questions the expert answered
+  const expertAnsweredQuestions = answeredQuestions.filter(q => 
+    q.answers && q.answers.some(answer => answer.expert_id === user?.id)
+  );
   
-  const handleOpenQuestion = (question: Question) => {
-    setSelectedQuestion(question);
-    form.reset();
-  };
-  
-  const handleCloseDialog = () => {
-    setSelectedQuestion(null);
-  };
-  
-  const onSubmit = async (data: FormData) => {
-    if (!selectedQuestion || !user) return;
-    
-    try {
-      setIsSubmitting(true);
-      await answerQuestion(selectedQuestion.id, data.answer, user.id, user.name);
-      setSelectedQuestion(null);
-    } catch (error) {
-      console.error("Error submitting answer:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="page-container">
       <Heading as="h1" size="xl" className="text-krishi-800 mb-6">Expert Dashboard</Heading>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="border-krishi-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-krishi-700">Questions Awaiting Answers</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Text size="4xl" className="font-bold text-krishi-600">{pendingQuestions.length}</Text>
-            <Text variant="muted">Farmers need your expertise</Text>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-krishi-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-krishi-700">Questions Answered</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Text size="4xl" className="font-bold text-krishi-600">{answeredQuestions.length}</Text>
-            <Text variant="muted">Helping knowledge grow</Text>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-krishi-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-krishi-700">Your Impact</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Text size="4xl" className="font-bold text-krishi-600">{user ? user.name : "Expert"}</Text>
-            <Text variant="muted">Agricultural Expert</Text>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Questions to Answer */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <Heading as="h2" size="lg" className="text-krishi-700">Questions Needing Answers</Heading>
-          <Link to="/expert/questions" className="text-krishi-600 hover:underline">
-            View All
-          </Link>
-        </div>
-        
-        {pendingQuestions.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pendingQuestions.slice(0, 4).map((question) => (
-              <Card 
-                key={question.id} 
-                className="hover:border-krishi-300 transition-colors cursor-pointer h-full"
-                onClick={() => handleOpenQuestion(question)}
-              >
-                <CardContent className="p-4">
-                  <div className="mb-2 flex justify-between">
-                    <Text size="sm" variant="highlight">
-                      Crop: {question.crop}
-                    </Text>
-                    <Text size="sm" variant="muted">
-                      {format(new Date(question.createdAt), "MMM d, yyyy")}
-                    </Text>
-                  </div>
-                  <Text className="font-semibold mb-2 line-clamp-2">{question.title}</Text>
-                  <Text size="sm" className="line-clamp-3 mb-3">{question.description}</Text>
-                  <div className="flex justify-between items-center">
-                    <Text size="sm" variant="muted">By: {question.farmerName}</Text>
-                    <Button size="sm" variant="outline" className="text-krishi-600 border-krishi-600 hover:bg-krishi-50">
-                      Answer
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Stats Cards */}
+        <div className="lg:col-span-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <Card className="border-krishi-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg text-krishi-700">Pending Questions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Text size="4xl" className="font-bold text-krishi-600">{pendingQuestions.length}</Text>
+                <Text variant="muted">Questions awaiting answers</Text>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-krishi-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg text-krishi-700">Questions Answered</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Text size="4xl" className="font-bold text-krishi-600">{expertAnsweredQuestions.length}</Text>
+                <Text variant="muted">Your contributions</Text>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-krishi-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg text-krishi-700">Total Questions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Text size="4xl" className="font-bold text-krishi-600">{questions.length}</Text>
+                <Text variant="muted">In the platform</Text>
+              </CardContent>
+            </Card>
           </div>
-        ) : (
-          <Card className="border-dashed border-2 p-6">
-            <div className="text-center py-8">
-              <Text variant="muted" className="mb-2">
-                There are currently no pending questions that need answers.
-              </Text>
-              <Text variant="muted">
-                Check back later as farmers submit new questions.
-              </Text>
-            </div>
-          </Card>
-        )}
-      </div>
-      
-      {/* Recently Answered */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <Heading as="h2" size="lg" className="text-krishi-700">Recently Answered</Heading>
         </div>
         
-        {answeredQuestions.length > 0 ? (
-          <div className="space-y-4">
-            {answeredQuestions.slice(0, 3).map((question) => (
-              <Card key={question.id} className="border-krishi-200">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <Text className="font-semibold">{question.title}</Text>
+        {/* Quick Actions */}
+        <div>
+          <Card className="border-krishi-200">
+            <CardHeader>
+              <CardTitle className="text-krishi-700">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button asChild className="w-full bg-krishi-600 hover:bg-krishi-700">
+                <Link to="/expert/questions">Answer Questions</Link>
+              </Button>
+              <Text size="sm" variant="muted" className="text-center">
+                Help farmers by sharing your expertise
+              </Text>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Recent Activity */}
+        <div className="lg:col-span-2">
+          <Card className="border-krishi-200">
+            <CardHeader>
+              <CardTitle className="text-krishi-700">Recent Questions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {pendingQuestions.slice(0, 5).map((question) => (
+                <div key={question.id} className="border-b pb-4 last:border-0 last:pb-0">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <Text className="font-medium">{question.title}</Text>
+                      <Text size="sm" variant="muted" className="mt-1">
+                        Crop: {question.crop} • {format(new Date(question.created_at), "MMM d, yyyy")}
+                      </Text>
+                      <Text size="sm" variant="muted">
+                        by {question.farmer?.name || "Unknown Farmer"}
+                      </Text>
+                    </div>
+                    <Badge variant="outline" className="ml-2">
+                      Pending
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+              
+              {pendingQuestions.length === 0 && (
+                <div className="text-center py-6">
+                  <Text variant="muted">No pending questions at the moment.</Text>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          <Card className="border-krishi-200 mt-6">
+            <CardHeader>
+              <CardTitle className="text-krishi-700">Your Recent Answers</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {expertAnsweredQuestions.slice(0, 3).map((question) => {
+                const userAnswer = question.answers?.find(answer => answer.expert_id === user?.id);
+                
+                return (
+                  <div key={question.id} className="border-b pb-4 last:border-0 last:pb-0">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <Text className="font-medium">{question.title}</Text>
+                        <Text size="sm" variant="muted" className="mt-1">
+                          Crop: {question.crop} • {format(new Date(question.created_at), "MMM d, yyyy")}
+                        </Text>
+                        {userAnswer && (
+                          <Text size="sm" className="mt-2 text-gray-600 line-clamp-2">
+                            Your answer: {userAnswer.content.substring(0, 100)}...
+                          </Text>
+                        )}
+                      </div>
+                      <Badge className="ml-2 bg-green-100 text-green-800">
+                        Answered
+                      </Badge>
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {expertAnsweredQuestions.length === 0 && (
+                <div className="text-center py-6">
+                  <Text variant="muted">You haven't answered any questions yet.</Text>
+                  <Button asChild className="mt-4 bg-krishi-600 hover:bg-krishi-700">
+                    <Link to="/expert/questions">Start Helping Farmers</Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+      
+      {/* Featured Section */}
+      <Card className="border-krishi-200 mt-6">
+        <CardHeader>
+          <CardTitle className="text-krishi-700">Platform Insights</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center">
+            <div className="text-3xl mb-2">🌾</div>
+            <Text className="font-medium">Most Asked About</Text>
+            <Text size="sm" variant="muted">Rice and Wheat crops</Text>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-3xl mb-2">📈</div>
+            <Text className="font-medium">Response Rate</Text>
+            <Text size="sm" variant="muted">85% questions answered</Text>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-3xl mb-2">👥</div>
+            <Text className="font-medium">Active Users</Text>
+            <Text size="sm" variant="muted">Growing community</Text>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Urgent Questions */}
+      {pendingQuestions.length > 0 && (
+        <Card className="border-amber-200 bg-amber-50 mt-6">
+          <CardHeader>
+            <CardTitle className="text-amber-800">Urgent: Questions Need Your Expertise</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {pendingQuestions.slice(0, 2).map((question) => (
+                <div key={question.id} className="flex items-center justify-between bg-white p-3 rounded-lg">
+                  <div>
+                    <Text className="font-medium">{question.title}</Text>
                     <Text size="sm" variant="muted">
-                      {format(new Date(question.createdAt), "MMM d, yyyy")}
+                      {question.farmer?.name || "Unknown Farmer"} • {format(new Date(question.created_at), "MMM d")}
                     </Text>
                   </div>
-                  <Text size="sm" variant="highlight" className="mb-3">Crop: {question.crop}</Text>
-                  <Text size="sm" className="line-clamp-2 mb-3">{question.description}</Text>
-                  
-                  {question.answer && (
-                    <div className="bg-green-50 p-3 rounded-md mt-2">
-                      <Text size="sm" className="font-medium mb-1">Your Answer:</Text>
-                      <Text size="sm" className="line-clamp-2">{question.answer.text}</Text>
+                  {question.image_url && (
+                    <div className="ml-4">
+                      <img 
+                        src={question.image_url} 
+                        alt="Question attachment" 
+                        className="w-12 h-12 object-cover rounded"
+                      />
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card className="border-dashed border-2 p-6">
-            <div className="text-center py-8">
-              <Text variant="muted">
-                You haven't answered any questions yet.
-              </Text>
-            </div>
-          </Card>
-        )}
-      </div>
-      
-      {/* Answer Dialog */}
-      <Dialog open={!!selectedQuestion} onOpenChange={handleCloseDialog}>
-        <DialogContent className="max-w-2xl">
-          {selectedQuestion && (
-            <>
-              <DialogHeader>
-                <DialogTitle>{selectedQuestion.title}</DialogTitle>
-                <DialogDescription className="flex flex-wrap items-center gap-2 mt-2">
-                  <span className="text-sm font-medium text-krishi-600">
-                    Crop: {selectedQuestion.crop}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    Asked by {selectedQuestion.farmerName} on {format(new Date(selectedQuestion.createdAt), "MMM d, yyyy")}
-                  </span>
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="space-y-4">
-                <div>
-                  <Text className="font-medium">Question:</Text>
-                  <Text className="mt-1 whitespace-pre-wrap">{selectedQuestion.description}</Text>
                 </div>
-                
-                {selectedQuestion.imageUrl && (
-                  <div>
-                    <Text className="font-medium mb-2">Attached Image:</Text>
-                    <img 
-                      src={selectedQuestion.imageUrl} 
-                      alt="Question attachment" 
-                      className="rounded-md max-h-64 w-auto"
-                    />
-                  </div>
-                )}
-                
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="answer"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Provide your expert advice here..." 
-                              className="min-h-[150px]"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <DialogFooter>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={handleCloseDialog}
-                        disabled={isSubmitting}
-                      >
-                        Cancel
-                      </Button>
-                      <Button 
-                        type="submit" 
-                        className="bg-krishi-600 hover:bg-krishi-700" 
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? "Submitting..." : "Submit Answer"}
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </Form>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+              ))}
+            </div>
+            <Button asChild className="w-full mt-4 bg-amber-600 hover:bg-amber-700">
+              <Link to="/expert/questions">View All Pending Questions</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
